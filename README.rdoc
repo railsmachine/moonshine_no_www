@@ -1,0 +1,12 @@
+= Moonshine No-www
+
+=== A plugin for Moonshine[http://github.com/railsmachine/moonshine]
+
+A plugin for enabled redirect from www subdomain to top domain!
+
+=== Instructions
+
+* <tt>script/plugin install git://github.com/railsmachine/moonshine_no_www.git</tt>
+
+* Invoke the recipe(s) in your Moonshine manifest
+    recipe :no_www
