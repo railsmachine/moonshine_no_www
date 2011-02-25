@@ -15,9 +15,9 @@ module Moonshine
         rewrite_www = <<-MOD_REWRITE
 
       # WWW Redirect
-      RewriteCond %{HTTP_HOST}   ^www.#{configuration[:domain].gsub('.', '\.')} [NC]
-      RewriteCond %{HTTP_HOST}   !^$
-      RewriteRule ^/(.*)         http://#{configuration[:domain].gsub('.', '\.')}/$1 [L,R=301]
+      RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
+      RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
+      RewriteRule               ^/(.*)$ http://%1/$1 [L,R=301]
       MOD_REWRITE
     
         configure(
@@ -30,12 +30,12 @@ module Moonshine
       end
       
       if configuration[:ssl]
-        rewrite_www_ssl =<<-MOD_REWRITE_SSL
+        rewrite_www_ssl = <<-MOD_REWRITE_SSL
 
       # SSL WWW Redirect
-      RewriteCond %{HTTP_HOST}   ^www.#{configuration[:domain].gsub('.', '\.')} [NC]
-      RewriteCond %{HTTP_HOST}   !^$
-      RewriteRule ^/(.*)         https://#{configuration[:domain].gsub('.', '\.')}/$1 [L,R=301]
+      RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
+      RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
+      RewriteRule               ^/(.*)$ https://%1/$1 [L,R=301]
       MOD_REWRITE_SSL
 
         configure(
