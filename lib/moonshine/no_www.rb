@@ -17,7 +17,7 @@ module Moonshine
       # WWW Redirect
       RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
       RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
-      RewriteRule               ^/(.*)$ http://%1/$1 [L,R=301]
+      RewriteRule               ^(.*)$ http://%1$1 [L,R=301]
       MOD_REWRITE
     
         configure(
@@ -35,7 +35,7 @@ module Moonshine
       # SSL WWW Redirect
       RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
       RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
-      RewriteRule               ^/(.*)$ https://%1/$1 [L,R=301]
+      RewriteRule               ^(.*)$ https://%1$1 [L,R=301]
       MOD_REWRITE_SSL
 
         configure(
