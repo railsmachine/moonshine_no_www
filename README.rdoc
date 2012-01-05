@@ -21,6 +21,12 @@ First, open up your config/moonshine.yml (or your config/moonshine/production.ym
 
     :domain: foo.com
 
+You can support any number of domains that your app is repsonsible for. In addition to :domain above, just add:
+
+    :domain_aliases:
+      - bar.com
+      - baz.com
+
 Next, open up your application manifest and add the recipe:
 
     recipe :no_www

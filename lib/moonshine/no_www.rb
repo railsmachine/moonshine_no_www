@@ -11,40 +11,37 @@ module Moonshine
     end
 
     def no_www
-      if configuration[:passenger]
-        rewrite_www = <<-MOD_REWRITE
+      all_domains = [configuration[:domain]] + (configuration[:domain_aliases] || [])
+      domains_to_rewrite = all_domains.reject {|domain| domain =~ /^www\./ }
 
-      # WWW Redirect
-      RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
-      RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
-      RewriteRule               ^(.*)$ http://%1$1 [L,R=301]
-      MOD_REWRITE
+      if configuration[:passenger]
+        rewrite_sections = domains_to_rewrite.map do |domain|
+          <<-MOD_REWRITE
+ # WWW Redirect
+ RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
+ RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
+ RewriteRule               ^(.*)$ http://%1$1 [L,R=301]
+MOD_REWRITE
+        end
     
-        configure(
-          {
-            :passenger => {
-              :vhost_extra => (configuration[:passenger][:vhost_extra] || '') + rewrite_www
-            }
-          }
-        )
+        configure :passenger => {
+                    :vhost_extra => (configuration[:passenger][:vhost_extra] || '') + rewrite_sections.join("\n\n")
+                  }
       end
       
       if configuration[:ssl]
-        rewrite_www_ssl = <<-MOD_REWRITE_SSL
+        rewrite_sections = domains_to_rewrite.map do |domain|
+         <<-MOD_REWRITE_SSL
+          # SSL WWW Redirect
+          RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
+          RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
+          RewriteRule               ^(.*)$ https://%1$1 [L,R=301]
+          MOD_REWRITE_SSL
+        end
 
-      # SSL WWW Redirect
-      RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
-      RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
-      RewriteRule               ^(.*)$ https://%1$1 [L,R=301]
-      MOD_REWRITE_SSL
-
-        configure(
-          {
-            :ssl => {
-              :vhost_extra => (configuration[:ssl][:vhost_extra] || '') + rewrite_www_ssl
-            }
-          }
-        )
+        configure :ssl => {
+                    :vhost_extra => (configuration[:ssl][:vhost_extra] || '') + rewrite_sections.join("\n\n")
+                  }
       end
     end
   end
