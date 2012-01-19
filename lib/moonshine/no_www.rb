@@ -26,7 +26,6 @@ MOD_REWRITE
       if configuration[:ssl]
         rewrite_section = <<-MOD_REWRITE_SSL
           # SSL WWW Redirect
-          RewriteCond %{HTTP_HOST}  !^#{domain.gsub('.', '\.')}$ [NC]
           RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
           RewriteRule               ^(.*)$ https://%1$1 [L,R=301]
         MOD_REWRITE_SSL
