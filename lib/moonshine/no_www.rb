@@ -11,36 +11,28 @@ module Moonshine
     end
 
     def no_www
-      all_domains = [configuration[:domain]] + (configuration[:domain_aliases] || [])
-      domains_to_rewrite = all_domains.reject {|domain| domain =~ /^www\./ }
-
       if configuration[:passenger]
-        rewrite_sections = domains_to_rewrite.map do |domain|
-          <<-MOD_REWRITE
+        rewrite_section = <<-MOD_REWRITE
  # WWW Redirect
- RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
  RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
  RewriteRule               ^(.*)$ http://%1$1 [L,R=301]
 MOD_REWRITE
-        end
     
         configure :passenger => {
-                    :vhost_extra => (configuration[:passenger][:vhost_extra] || '') + rewrite_sections.join("\n\n")
+                    :vhost_extra => (configuration[:passenger][:vhost_extra] || '') + rewrite_section
                   }
       end
       
       if configuration[:ssl]
-        rewrite_sections = domains_to_rewrite.map do |domain|
-         <<-MOD_REWRITE_SSL
+        rewrite_section = <<-MOD_REWRITE_SSL
           # SSL WWW Redirect
-          RewriteCond %{HTTP_HOST}  !^#{configuration[:domain].gsub('.', '\.')}$ [NC]
+          RewriteCond %{HTTP_HOST}  !^#{domain.gsub('.', '\.')}$ [NC]
           RewriteCond %{HTTP_HOST}  ^www\.(.*) [NC]
           RewriteRule               ^(.*)$ https://%1$1 [L,R=301]
-          MOD_REWRITE_SSL
-        end
+        MOD_REWRITE_SSL
 
         configure :ssl => {
-                    :vhost_extra => (configuration[:ssl][:vhost_extra] || '') + rewrite_sections.join("\n\n")
+                    :vhost_extra => (configuration[:ssl][:vhost_extra] || '') + rewrite_section
                   }
       end
     end
